@@ -1,0 +1,46 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.lock
+
+# Android
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+android/key.properties
+*.jks
+*.keystore
+
+# iOS
+ios/Flutter/.last_build_id
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Pods/
+ios/.symlinks/
+ios/Runner.xcworkspace/
+**/*.mode1v3
+**/*.mode2v3
+**/*.moved-aside
+**/*.pbxuser
+**/*.perspectivev3
+**/*sync/
+.last_build_id
+*.pyc
+
+# Firebase configs (secrets)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store

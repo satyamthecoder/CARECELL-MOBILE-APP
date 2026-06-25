@@ -1,0 +1,27 @@
+spring:
+  data:
+    mongodb:
+      database: carecell_test
+  redis:
+    host: localhost
+    port: 6379
+
+jwt:
+  secret: dGVzdF9zZWNyZXRfa2V5X2Zvcl91bml0X3Rlc3RzX29ubHlfMjU2Yml0
+  expiration-ms: 86400000
+  refresh-expiration-ms: 604800000
+
+aws:
+  region: ap-south-1
+  access-key: test
+  secret-key: test
+  s3:
+    bucket-name: test-bucket
+
+google:
+  maps:
+    api-key: test-key
+
+ai:
+  service:
+    base-url: http://localhost:8001

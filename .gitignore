@@ -1,0 +1,17 @@
+# Environment files — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+google-services.json
+GoogleService-Info.plist
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# OS
+Thumbs.db

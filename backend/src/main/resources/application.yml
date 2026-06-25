@@ -1,0 +1,148 @@
+# ═══════════════════════════════════════════════
+#  CareCell — Production Application Properties
+#  Replace all ${...} with actual values via env vars
+# ═══════════════════════════════════════════════
+
+spring:
+  application:
+    name: carecell-backend
+
+  # ── MongoDB Atlas ──────────────────────────────
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/carecell?retryWrites=true&w=majority}
+      database: carecell
+      auto-index-creation: true   # Required so the @GeoSpatialIndexed 2dsphere index on User.location is actually created
+
+  # ── Redis (OTP cache + rate limiting) ──────────
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 10
+        min-idle: 2
+
+  # ── Mail (OPTIONAL — primary OTP delivery is SMS via AWS SNS, see otp_service) ──
+  # Mail is NOT required to run this app. If you don't set MAIL_USERNAME/MAIL_PASSWORD,
+  # leave management.health.mail.enabled below at "false" or Actuator will try a live
+  # SMTP login on every /actuator/health call and fail loudly in the logs.
+  #
+  # If you DO want mail enabled: Gmail requires an "App Password", not your normal
+  # account password. Generate one at https://myaccount.google.com/apppasswords
+  # (requires 2-Step Verification to be turned on first). Using your regular Gmail
+  # password will always fail with "535-5.7.8 BadCredentials" — that is not a bug
+  # in this app, it's Gmail rejecting non-app-password SMTP auth.
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+
+  # ── Jackson ────────────────────────────────────
+  jackson:
+    default-property-inclusion: NON_NULL
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Kolkata
+
+  # ── File Upload ────────────────────────────────
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
+
+# ── Server ─────────────────────────────────────
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,text/plain
+  error:
+    include-message: never
+    include-stacktrace: never
+
+# ── JWT ────────────────────────────────────────
+jwt:
+  secret: ${JWT_SECRET:REPLACE_WITH_256_BIT_SECRET_KEY_BASE64_ENCODED}
+  expiration-ms: 86400000       # 24 hours
+  refresh-expiration-ms: 604800000  # 7 days
+
+# ── AWS ────────────────────────────────────────
+aws:
+  region: ${AWS_REGION:ap-south-1}
+  access-key: ${AWS_ACCESS_KEY:}
+  secret-key: ${AWS_SECRET_KEY:}
+  s3:
+    bucket-name: ${AWS_S3_BUCKET:carecell-health-records}
+    url-expiry-minutes: 60
+  sns:
+    sender-id: CareCell
+
+# ── OTP ────────────────────────────────────────
+otp:
+  expiry-minutes: 10
+  length: 6
+  max-attempts: 3
+
+# ── Google Maps (Hospital Finder) ──────────────
+google:
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY:}
+
+# ── AI Service (Python FastAPI) ────────────────
+ai:
+  service:
+    base-url: ${AI_SERVICE_URL:http://ai-service:8001}
+    timeout-seconds: 30
+
+# ── WhatsApp (Twilio or Meta API) ──────────────
+whatsapp:
+  provider: ${WHATSAPP_PROVIDER:meta}
+  api-token: ${WHATSAPP_TOKEN:}
+  phone-number-id: ${WHATSAPP_PHONE_ID:}
+
+# ── Actuator (health checks) ───────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    # Disabled by default: Actuator auto-detects JavaMailSender on the classpath and
+    # otherwise runs a real SMTP login against MAIL_HOST on every /actuator/health call,
+    # including the Docker HEALTHCHECK directive — which fails loudly if mail isn't
+    # configured with a real App Password. Set MAIL_HEALTH_ENABLED=true once mail is set up.
+    mail:
+      enabled: ${MAIL_HEALTH_ENABLED:false}
+
+# ── Logging ────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.carecell: DEBUG
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ── API Rate Limiting ──────────────────────────
+rate-limiting:
+  enabled: true
+  otp-requests-per-hour: 5
+  general-requests-per-minute: 60
+
+# ── CORS ───────────────────────────────────────
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000}

@@ -1,0 +1,106 @@
+version: '3.9'
+
+# ═══════════════════════════════════════════════
+#  CareCell — Full Stack Local Development
+#  Run: docker compose up --build
+# ═══════════════════════════════════════════════
+
+services:
+
+  # ── MongoDB ──────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: carecell-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-carecell_admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-changeme_in_prod}
+      MONGO_INITDB_DATABASE: carecell
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - carecell-net
+
+  # ── Redis ────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: carecell-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - carecell-net
+
+  # ── Java Spring Boot Backend ─────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: carecell-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URI: mongodb://${MONGO_ROOT_USER:-carecell_admin}:${MONGO_ROOT_PASSWORD:-changeme_in_prod}@mongodb:27017/carecell?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+      AWS_REGION: ${AWS_REGION:-ap-south-1}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY:-}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-carecell-health-records}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_HEALTH_ENABLED: ${MAIL_HEALTH_ENABLED:-false}
+      AI_SERVICE_URL: http://ai-service:8801
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    depends_on:
+      - mongodb
+      - redis
+      - ai-service
+    networks:
+      - carecell-net
+
+  # ── Python FastAPI AI Service ────────────────
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: carecell-ai
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      CORS_ORIGINS: "*"
+    networks:
+      - carecell-net
+
+  # ── Mongo Express (DB Admin UI, optional) ────
+  mongo-express:
+    image: mongo-express:1.0
+    container_name: carecell-mongo-ui
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USER:-carecell_admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-changeme_in_prod}
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    depends_on:
+      - mongodb
+    networks:
+      - carecell-net
+
+networks:
+  carecell-net:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  redis_data:

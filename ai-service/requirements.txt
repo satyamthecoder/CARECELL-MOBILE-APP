@@ -1,0 +1,21 @@
+fastapi==0.110.0
+uvicorn[standard]==0.27.1
+pydantic==2.6.1
+
+# ML/NLP — per PRD Tech Stack (Section 9)
+torch==2.2.0
+tensorflow==2.15.0
+scikit-learn==1.4.0
+pandas==2.2.0
+numpy==1.26.4
+
+# Web scraping for scheme/hospital data ingestion
+beautifulsoup4==4.12.3
+scrapy==2.11.1
+
+# HTTP client (for calling external LLM APIs if wired in)
+httpx==0.26.0
+python-dotenv==1.0.1
+
+# Optional: LangChain for RAG over medical/scheme documents
+langchain==0.1.9
