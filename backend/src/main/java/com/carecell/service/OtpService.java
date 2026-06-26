@@ -1,4 +1,4 @@
-package com.carecell.service;
+/*package com.carecell.service;
 
 import com.carecell.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class OtpService {
 
     private final SecureRandom random = new SecureRandom();
 
-    /** Generate, store and send OTP via SMS (AWS SNS) */
+    /** Generate, store and send OTP via SMS (AWS SNS) *//*
     public void sendOtp(String mobileNumber) {
         String otp = generateOtp();
         String key = OTP_KEY_PREFIX + mobileNumber;
@@ -51,7 +51,7 @@ public class OtpService {
         log.info("OTP sent to +91{}", mobileNumber);
     }
 
-    /** Validate OTP — throws on failure, cleans up on success */
+    /** Validate OTP — throws on failure, cleans up on success *//*
     public void verifyOtp(String mobileNumber, String otp) {
         String attemptsKey = ATTEMPT_KEY_PREFIX + mobileNumber;
         Long attempts = redisTemplate.opsForValue().increment(attemptsKey);
@@ -99,6 +99,33 @@ public class OtpService {
         } catch (Exception e) {
             log.error("Failed to send SMS to {}: {}", mobileNumber, e.getMessage());
             // In production: queue for retry via SQS. Don't fail the request.
+        }
+    }*/
+
+
+//}
+
+
+//new code for bypass otp services 
+package com.carecell.service;
+
+import com.carecell.exception.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+public class OtpService {
+
+    public void sendOtp(String mobileNumber) {
+        log.warn("==========================================");
+        log.warn("DEV MODE OTP for {} : 123456", mobileNumber);
+        log.warn("==========================================");
+    }
+
+    public void verifyOtp(String mobileNumber, String otp) {
+        if (!"123456".equals(otp)) {
+            throw new BadRequestException("Invalid OTP");
         }
     }
 }

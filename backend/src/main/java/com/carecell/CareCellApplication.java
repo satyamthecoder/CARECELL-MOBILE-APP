@@ -1,31 +1,3 @@
-/*package com.carecell;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-
-/**
- * CareCell — AI-Powered Healthcare Assistance Platform
- * Production Backend Entry Point
- */
-//@SpringBootApplication
-//@EnableMongoAuditing
-//@EnableCaching
-//@EnableAsync
-//@EnableScheduling
-//public class CareCellApplication {
-  //  public static void main(String[] args) {
-    //    SpringApplication.run(CareCellApplication.class, args);
-    //}
-//}
-*/
-
-
-// new code for testing 
-
 package com.carecell;
 
 import org.springframework.beans.factory.annotation.Value;

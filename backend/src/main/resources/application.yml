@@ -127,7 +127,9 @@ management:
     # configured with a real App Password. Set MAIL_HEALTH_ENABLED=true once mail is set up.
     mail:
       enabled: ${MAIL_HEALTH_ENABLED:false}
-
+    
+    redis:
+    enabled: false 
 # ── Logging ────────────────────────────────────
 logging:
   level:
